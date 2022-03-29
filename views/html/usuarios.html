@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+    <title>Cadastro de Usuários</title>
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">Locadora de carros</a>
+        <button class="navbar-toggler" type="button" data-cbs-toggle="collapse" data-bs-target="/" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/carros">Carros</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/usuarios">Usuários</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="">Locações</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container-fluid container-sm">
+    <h1>Cadastro de usuários</h1>
+    <form class="row" method="post" action="/submitUsuarios">
+        <div class="col-md-2">
+            <label for="codigo" class="form-label">Código</label>
+            <input type="text" class="form-control" id="codigo" aria-describedby="Codigo" name="codigo" value="">
+        </div>
+        <div class="col-md-4">
+            <label for="nome" class="form-label">Nome e sobrenome</label>
+            <input type="text" class="form-control" id="nome" aria-describedby="Nome" name="nome" value="">
+        </div>
+        <div class="col-md-3">
+            <label for="cnh" class="form-label">CNH</label>
+            <input type="text" class="form-control" id="cnh" aria-describedby="CNH" name="cnh" value="">
+        </div>
+        <div class="col-md-3">
+            <label for="dataNascimento" class="form-label">Data de nascimento</label>
+            <input type="text" class="form-control" id="dataNascimento" aria-describedby="Data Nascimento" name="dataNascimento" value="">
+        </div>
+        <div class="col-md-3">
+            <label for="telefone" class="form-label">Telefone</label>
+            <input type="text" class="form-control" id="telefone" aria-describedby="Telefone" name="telefone" value="">
+        </div>
+        <div class="col-md-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="text" class="form-control" id="email" aria-describedby="Email" name="email" value="">
+        </div>
+        <div class="col-md-6">
+            <label for="endereco" class="form-label">Endereço</label>
+            <input type="text" class="form-control" id="endereco" aria-describedby="Endereço" name="endereco" value="">
+        </div>
+        <hr style="margin-top: 40px">
+        <div class="col-md-3" style="margin-bottom: 20px; margin-top: 20px">
+            <button type="submit" class="btn btn-primary btn-md">Cadastrar</button>
+        </div>
+    </form>
+    <table class="table table-striped table-hover">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Código</th>
+            <th scope="col">Nome e sobrenome</th>
+            <th scope="col">CNH</th>
+            <th scope="col">Data de Nascimento</th>
+            <th scope="col">Telefone</th>
+            <th scope="col">Email</th>
+            <th scope="col">Endereço</th>
+        </tr>
+        </thead>
+        <body>
+        {$table}
+        </body>
+    </table>
+    <div class="col-md-3">
+        <a href="/" class="btn btn-primary btn-md">Voltar</a>
+    </div>
+</div>
+</body>
+</html>
