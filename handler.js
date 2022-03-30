@@ -6,6 +6,7 @@ var path = require('path');
 
 var listaOperacoes = [];
 var list_acoes = [];
+var listaMinhasAcoes = [];
 
 
 var readFile = (file) => {
@@ -24,6 +25,10 @@ var collectData = (rq, rota, cal) => {
             list_carros.push(new_element);
         } else if (rota === 'usuarios') {
             list_usuarios.push(new_element);
+        } else if(rota === 'transacoes')
+        {
+            listaOperacoes.push(new_element);
+            listaMinhasAcoes.push(new_element);
         }
         cal(new_element);
     });
@@ -73,7 +78,7 @@ module.exports = (request, response) => {
                         .replace("{$setorAtuacao}", a.setorAtuacao)
                         .replace("{$valor}", a.valor)
                         .replace("{$qtde}", a.qtde)
-                        .replace("{$valorTotal}", a.valorTotal);
+                        .replace("{$valorTotal}", (a.valor * a.qtde));
                 });
 
                 operacoes = operacoes.replace("{$listaAcoes}", listaAcoesAbertas);
@@ -88,9 +93,8 @@ module.exports = (request, response) => {
     } else if (request.method === 'POST') {
         switch (request.url.trim()) {
             case "/acao_comprar":
-                collectData(request, (data) => {
+                collectData(request, 'operacoes', (data) => {
                     response.writeHead(200, { "Content-Type": "text/html" });
-                    listOperacoes.push(data);
                     response.end(readFile("index.html"));
                 });
                 break;
