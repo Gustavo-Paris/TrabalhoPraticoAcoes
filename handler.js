@@ -1,15 +1,15 @@
 const fs = require("fs");
-const {parse} = require("querystring");
+const { parse } = require("querystring");
 
 var url = require('url');
 var path = require('path');
 
-var list_carros = [];
-var list_usuarios = [];
+var listaOperacoes = [];
+var list_acoes = [];
 
 
 var readFile = (file) => {
-    let html = fs.readFileSync(__dirname + "/views/html/"+ file, "utf8");
+    let html = fs.readFileSync(__dirname + "/views/html/" + file, "utf8");
     return html;
 };
 
@@ -18,11 +18,11 @@ var collectData = (rq, rota, cal) => {
     rq.on('data', (chunk) => {
         data += chunk;
     });
-    rq.on ('end', () => {
+    rq.on('end', () => {
         let new_element = parse(data);
-        if(rota === 'carros'){
+        if (rota === 'carros') {
             list_carros.push(new_element);
-        }else if(rota === 'usuarios'){
+        } else if (rota === 'usuarios') {
             list_usuarios.push(new_element);
         }
         cal(new_element);
@@ -34,84 +34,79 @@ module.exports = (request, response) => {
         let url_parsed = url.parse(request.url, true);
         switch (url_parsed.pathname) {
             case '/':
-                response.writeHead(200, {'Content-Type': 'text/html'});
+                response.writeHead(200, { 'Content-Type': 'text/html' });
                 response.end(readFile("index.html"));
                 break;
-            case '/carros':
-                response.writeHead(200, {'Content-Type': 'text/html'});
-                response.end(readFile("acoes.html").replace("{$table}", ''));
-                break;
-            case '/usuarios':
-                response.writeHead(200, {'Content-Type': 'text/html'});
-                response.end(readFile("usuarios.html").replace("{$table}", ''));
+            case '/operacoes':
+                response.writeHead(200, { 'Content-Type': 'text/html' });
+                let operacoes = readFile("operacoes.html");
+
+                let listaAcoesAbertas = "";
+                let strReplace = `
+                <option value="{$id}">{$idShow}</option>
+                `
+
+                list_acoes.forEach((a) => {
+                    listaAcoesAbertas += strReplace
+                        .replace("{$id}", a.id)
+                        .replace("{$idShow}", a.id);
+                });
+
+                let listAcoesSubstituir = "";
+                let stringReplace = `
+                <tr>
+                            <td>{$tipo}</td>
+                            <td>{$id}</td>
+                            <td>{$fracionario}</td>
+                            <td>{$setorAtuacao}</td>
+                            <td>{$valor}</td>
+                            <td>{$qtde}</td>
+                            <td>{$valorTotal}</td>
+                        </tr>
+                `;
+
+                listaOperacoes.forEach((a) => {
+                    listAcoesSubstituir += stringReplace
+                        .replace("{$tipo}", a.tipo)
+                        .replace("{$id}", a.tipo)
+                        .replace("{$fracionario}", a.fracionario)
+                        .replace("{$setorAtuacao}", a.setorAtuacao)
+                        .replace("{$valor}", a.valor)
+                        .replace("{$qtde}", a.qtde)
+                        .replace("{$valorTotal}", a.valorTotal);
+                });
+
+                operacoes = operacoes.replace("{$listaAcoes}", listaAcoesAbertas);
+
+                operacoes = operacoes.replace("{$listaTransacoes}", listAcoesSubstituir);
+
+                response.end(operacoes);
                 break;
             default:
                 break;
         }
-      } else if (request.method === 'POST') {
+    } else if (request.method === 'POST') {
         switch (request.url.trim()) {
-            case '/submitCarros':
-                collectData(request,'carros',() => {
-                    response.writeHead(200, {'Content-Type': 'text/html'});
-                    let html_retorno = '';
-                    let count = 0;
-                    for (let dados of list_carros){
-                        count++;
-                        let radio = 'Não';
-                        if(dados.inlineRadioOptions === 'S'){
-                            radio = 'Sim';
-                        }
-                        html_retorno += `<tr>
-                            <th scope="row">`+count+`</th>
-                            <td>`+dados.codigo+`</td>
-                            <td>`+dados.nome+`</td>
-                            <td>`+dados.marca+`</td>
-                            <td>`+dados.modelo+`</td>
-                            <td>`+dados.preco+`</td>
-                            <td>`+dados.valorLoc+`</td>
-                            <td>`+radio+`</td>
-                            </tr>`;
-                    }
-                    response.end(readFile("acoes.html").replace("{$table}", html_retorno));
+            case "/acao_comprar":
+                collectData(request, (data) => {
+                    response.writeHead(200, { "Content-Type": "text/html" });
+                    listOperacoes.push(data);
+                    response.end(readFile("index.html"));
                 });
                 break;
-            case '/submitUsuarios':
-                collectData(request,'usuarios',() => {
-                    response.writeHead(200, {'Content-Type': 'text/html'});
-                    let html_retorno = '';
-                    let count = 0;
-                    for (let dados of list_usuarios){
-                        count++;
-                        let radio = 'Não';
-                        if(dados.inlineRadioOptions === 'S'){
-                            radio = 'Sim';
-                        }
-                        html_retorno += `<tr>
-                            <th scope="row">`+count+`</th>
-                            <td>`+dados.codigo+`</td>
-                            <td>`+dados.nome+`</td>
-                            <td>`+dados.cnh+`</td>
-                            <td>`+dados.dataNascimento+`</td>
-                            <td>`+dados.telefone+`</td>
-                            <td>`+dados.email+`</td>
-                            <td>`+dados.endereco+`</td>
-                            </tr>`;
-                    }
-                    response.end(readFile("usuarios.html").replace("{$table}", html_retorno));
-                });
-                break;
+
             case '/action':
                 collectData(request, (data) => {
-                    response.writeHead(200, {'Content-Type': 'text/plain'});
+                    response.writeHead(200, { 'Content-Type': 'text/plain' });
                     console.log(data.fname);
-                    response.end("Elemento: " +data.fname + " cadastrado!");
-                });    
+                    response.end("Elemento: " + data.fname + " cadastrado!");
+                });
                 break;
-        
+
             default:
-                response.writeHead(404, {'Content-Type': 'text/plain'});
+                response.writeHead(404, { 'Content-Type': 'text/plain' });
                 response.end('Not a post action!');
                 break;
         }
-      }
+    }
 };
