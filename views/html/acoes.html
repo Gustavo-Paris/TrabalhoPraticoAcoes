@@ -11,62 +11,63 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/">Locadora de carros</a>
+        <a class="navbar-brand" href="/">Controladora de Ações</a>
         <button class="navbar-toggler" type="button" data-cbs-toggle="collapse" data-bs-target="/" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" href="/carros">Carros</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/usuarios">Usuários</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="">Locações</a>
+                    <a class="nav-link" href="/acoes">Ações</a>
                 </li>
             </ul>
         </div>
     </div>
 </nav>
 <div class="container-fluid container-sm">
-    <h1>Cadastro de carro</h1>
-    <form class="row" method="post" action="/submitCarros">
-        <div class="col-md-2">
+    <h1>Cadastro de Ações</h1>
+    <form class="row" method="POST" action="submitAcoes">
+        <div class="col-md-1">
             <label for="codigo" class="form-label">Código</label>
             <input type="text" class="form-control" id="codigo" aria-describedby="Codigo" name="codigo" value="">
         </div>
-        <div class="col-md-5">
-            <label for="nome" class="form-label">Nome</label>
-            <input type="text" class="form-control" id="nome" aria-describedby="Nome" name="nome" value="">
+        <div class="col-md-2">
+            <label for="identificacao" class="form-label">Identificação</label>
+            <input type="text" class="form-control" id="identificacao" aria-describedby="Identificacao" name="identificacao" value="">
         </div>
         <div class="col-md-2">
-            <label for="marca" class="form-label">Marca</label>
-            <input type="text" class="form-control" id="marca" aria-describedby="Marca" name="marca" value="">
+            <label for="tipo">Tipo</label>
+            <select style="margin-top: 8px" id="tipo" name="tipo" class="form-select form-select-md">
+                <option selected>Escolha</option>
+                <option value="1" selected>Preferencial</option>
+                <option value="2" selected>Ordinária</option>
+            </select>
         </div>
-        <div class="col-md-3">
-            <label for="modelo" class="form-label">Modelo</label>
-            <input type="text" class="form-control" id="modelo" aria-describedby="Modelo" name="modelo" value="">
-        </div>
-        <div class="col-md-4">
-            <label for="preco" class="form-label">Preço</label>
-            <input type="text" class="form-control" id="preco" aria-describedby="Preco" name="preco" value="">
-        </div>
-        <div class="col-md-4">
-            <label for="valorLoc" class="form-label">Valor de locação</label>
-            <input type="text" class="form-control" id="valorLoc" aria-describedby="ValorLoc" name="valorLoc" value="">
-        </div>
-        <div class="col-md-4" style="margin-top: 35px">
-            <label>Disponível?</label>
-            <div class="form-check form-check-inline" style="margin-left: 10px">
-                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="S">
-                <label class="form-check-label" for="inlineRadio1">Sim</label>
+        <div class="col-md-3" style="margin-top: 35px">
+            <label>Fracionária?</label>
+            <div class="form-check form-check-inline" style="margin-left: 20px">
+                <input class="form-check-input" type="radio" name="fracionaria" id="fracionaria1" value="S">
+                <label class="form-check-label" for="fracionaria1">Sim</label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="N">
-                <label class="form-check-label" for="inlineRadio2">Não</label>
+                <input class="form-check-input" type="radio" name="fracionaria" id="fracionaria2" value="N">
+                <label class="form-check-label" for="fracionaria2">Não</label>
             </div>
+        </div>
+        <div class="col-md-2">
+            <label for="setor">Setor de Atuação</label>
+            <select style="margin-top: 8px" id="setor" name="setor" class="form-select form-select-md">
+                <option selected>Escolha</option>
+                <option value="1" selected>Comunicações</option>
+                <option value="2" selected>Bens Industriais</option>
+                <option value="3" selected>Consumo cíclico</option>
+                <option value="4" selected>Financeiro</option>
+                <option value="5" selected>Saúde</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label for="valor" class="form-label">Valor</label>
+            <input type="text" class="form-control" id="valor" aria-describedby="Valor" name="valor" value="">
         </div>
         <hr style="margin-top: 40px">
         <div class="col-md-3" style="margin-bottom: 20px; margin-top: 20px">
@@ -76,14 +77,12 @@
     <table class="table table-striped table-hover">
         <thead>
         <tr>
-            <th scope="col">#</th>
             <th scope="col">Código</th>
-            <th scope="col">Nome</th>
-            <th scope="col">Marca</th>
-            <th scope="col">Modelo</th>
-            <th scope="col">Preço</th>
-            <th scope="col">Valor Locação</th>
-            <th scope="col">Disponível?</th>
+            <th scope="col">Identificação</th>
+            <th scope="col">Tipo</th>
+            <th scope="col">Fracionária?</th>
+            <th scope="col">Setor de Atuação</th>
+            <th scope="col">Valor</th>
         </tr>
         </thead>
         <tbody>{$table}</tbody>

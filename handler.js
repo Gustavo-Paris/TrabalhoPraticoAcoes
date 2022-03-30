@@ -4,9 +4,8 @@ const {parse} = require("querystring");
 var url = require('url');
 var path = require('path');
 
-var list_carros = [];
+var list_acoes = [];
 var list_usuarios = [];
-
 
 var readFile = (file) => {
     let html = fs.readFileSync(__dirname + "/views/html/"+ file, "utf8");
@@ -20,10 +19,8 @@ var collectData = (rq, rota, cal) => {
     });
     rq.on ('end', () => {
         let new_element = parse(data);
-        if(rota === 'carros'){
-            list_carros.push(new_element);
-        }else if(rota === 'usuarios'){
-            list_usuarios.push(new_element);
+        if(rota === 'acoes'){
+            list_acoes.push(new_element);
         }
         cal(new_element);
     });
@@ -37,39 +34,47 @@ module.exports = (request, response) => {
                 response.writeHead(200, {'Content-Type': 'text/html'});
                 response.end(readFile("index.html"));
                 break;
-            case '/carros':
+            case '/acoes':
                 response.writeHead(200, {'Content-Type': 'text/html'});
                 response.end(readFile("acoes.html").replace("{$table}", ''));
-                break;
-            case '/usuarios':
-                response.writeHead(200, {'Content-Type': 'text/html'});
-                response.end(readFile("usuarios.html").replace("{$table}", ''));
                 break;
             default:
                 break;
         }
       } else if (request.method === 'POST') {
         switch (request.url.trim()) {
-            case '/submitCarros':
-                collectData(request,'carros',() => {
+            case '/submitAcoes':
+                collectData(request,'acoes',() => {
                     response.writeHead(200, {'Content-Type': 'text/html'});
                     let html_retorno = '';
-                    let count = 0;
-                    for (let dados of list_carros){
-                        count++;
-                        let radio = 'Não';
-                        if(dados.inlineRadioOptions === 'S'){
-                            radio = 'Sim';
+                    for (let dados of list_acoes){
+                        let fracionaria = 'Não';
+                        if(dados.fracionaria === 'S'){
+                            fracionaria = 'Sim';
                         }
+                        let tipo = 'Preferencial';
+                        if(dados.tipo === 2){
+                            tipo = 'Ordinária';
+                        }
+
+                        let setor = 'Saúde';
+                        if(setor.fracionaria === 1){
+                            setor = 'Comunicações';
+                        }else if(setor.fracionaria === 2){
+                            setor = 'Bens Industriais';
+                        }else if(setor.fracionaria === 3){
+                            setor = 'Consumo cíclico'
+                        }else if(setor.fracionaria === 4){
+                            setor = 'Financeiro'
+                        }
+
                         html_retorno += `<tr>
-                            <th scope="row">`+count+`</th>
-                            <td>`+dados.codigo+`</td>
-                            <td>`+dados.nome+`</td>
-                            <td>`+dados.marca+`</td>
-                            <td>`+dados.modelo+`</td>
-                            <td>`+dados.preco+`</td>
-                            <td>`+dados.valorLoc+`</td>
-                            <td>`+radio+`</td>
+                            <th scope="row">`+dados.codigo+`</th>
+                            <td>`+dados.identificacao+`</td>
+                            <td>`+tipo+`</td>
+                            <td>`+fracionaria+`</td>
+                            <td>`+setor+`</td>
+                            <td>`+dados.valor+`</td>
                             </tr>`;
                     }
                     response.end(readFile("acoes.html").replace("{$table}", html_retorno));
@@ -100,14 +105,6 @@ module.exports = (request, response) => {
                     response.end(readFile("usuarios.html").replace("{$table}", html_retorno));
                 });
                 break;
-            case '/action':
-                collectData(request, (data) => {
-                    response.writeHead(200, {'Content-Type': 'text/plain'});
-                    console.log(data.fname);
-                    response.end("Elemento: " +data.fname + " cadastrado!");
-                });    
-                break;
-        
             default:
                 response.writeHead(404, {'Content-Type': 'text/plain'});
                 response.end('Not a post action!');
