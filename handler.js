@@ -4,11 +4,12 @@ const {parse} = require("querystring");
 var url = require('url');
 var path = require('path');
 
+var listaOperacoes = [];
 var list_acoes = [];
-var list_usuarios = [];
+var listaMinhasAcoes = [];
 
 var readFile = (file) => {
-    let html = fs.readFileSync(__dirname + "/views/html/"+ file, "utf8");
+    let html = fs.readFileSync(__dirname + "/views/html/" + file, "utf8");
     return html;
 };
 
@@ -17,10 +18,13 @@ var collectData = (rq, rota, cal) => {
     rq.on('data', (chunk) => {
         data += chunk;
     });
-    rq.on ('end', () => {
+    rq.on('end', () => {
         let new_element = parse(data);
-        if(rota === 'acoes'){
+        if (rota === 'acoes') {
             list_acoes.push(new_element);
+        } else if (rota === 'transacoes') {
+            listaOperacoes.push(new_element);
+            listaMinhasAcoes.push(new_element);
         }
         cal(new_element);
     });
@@ -38,71 +42,97 @@ module.exports = (request, response) => {
                 response.writeHead(200, {'Content-Type': 'text/html'});
                 response.end(readFile("acoes.html").replace("{$table}", ''));
                 break;
+            case '/operacoes':
+                response.writeHead(200, {'Content-Type': 'text/html'});
+                let operacoes = readFile("operacoes.html");
+
+                let listaAcoesAbertas = "";
+                let strReplace = `
+                <option value="{$id}">{$idShow}</option>
+                `
+
+                list_acoes.forEach((a) => {
+                    listaAcoesAbertas += strReplace
+                        .replace("{$id}", a.id)
+                        .replace("{$idShow}", a.id);
+                });
+
+                let listAcoesSubstituir = "";
+                let stringReplace = `
+                <tr>
+                            <td>{$tipo}</td>
+                            <td>{$id}</td>
+                            <td>{$fracionario}</td>
+                            <td>{$setorAtuacao}</td>
+                            <td>{$valor}</td>
+                            <td>{$qtde}</td>
+                            <td>{$valorTotal}</td>
+                        </tr>
+                `;
+
+                listaOperacoes.forEach((a) => {
+                    listAcoesSubstituir += stringReplace
+                        .replace("{$tipo}", a.tipo)
+                        .replace("{$id}", a.tipo)
+                        .replace("{$fracionario}", a.fracionario)
+                        .replace("{$setorAtuacao}", a.setorAtuacao)
+                        .replace("{$valor}", a.valor)
+                        .replace("{$qtde}", a.qtde)
+                        .replace("{$valorTotal}", (a.valor * a.qtde));
+                });
+
+                operacoes = operacoes.replace("{$listaAcoes}", listaAcoesAbertas);
+
+                operacoes = operacoes.replace("{$listaTransacoes}", listAcoesSubstituir);
+
+                response.end(operacoes);
+                break;
             default:
                 break;
         }
-      } else if (request.method === 'POST') {
+    } else if (request.method === 'POST') {
         switch (request.url.trim()) {
             case '/submitAcoes':
-                collectData(request,'acoes',() => {
+                collectData(request, 'acoes', () => {
                     response.writeHead(200, {'Content-Type': 'text/html'});
                     let html_retorno = '';
-                    for (let dados of list_acoes){
+                    for (let dados of list_acoes) {
                         let fracionaria = 'Não';
-                        if(dados.fracionaria === 'S'){
+                        if (dados.fracionaria === 'S') {
                             fracionaria = 'Sim';
                         }
                         let tipo = 'Preferencial';
-                        if(dados.tipo === 2){
+                        if (dados.tipo === 2) {
                             tipo = 'Ordinária';
                         }
 
                         let setor = 'Saúde';
-                        if(setor.fracionaria === 1){
+                        if (setor.fracionaria === 1) {
                             setor = 'Comunicações';
-                        }else if(setor.fracionaria === 2){
+                        } else if (setor.fracionaria === 2) {
                             setor = 'Bens Industriais';
-                        }else if(setor.fracionaria === 3){
+                        } else if (setor.fracionaria === 3) {
                             setor = 'Consumo cíclico'
-                        }else if(setor.fracionaria === 4){
+                        } else if (setor.fracionaria === 4) {
                             setor = 'Financeiro'
                         }
 
                         html_retorno += `<tr>
-                            <th scope="row">`+dados.codigo+`</th>
-                            <td>`+dados.identificacao+`</td>
-                            <td>`+tipo+`</td>
-                            <td>`+fracionaria+`</td>
-                            <td>`+setor+`</td>
-                            <td>`+dados.valor+`</td>
+                            <th scope="row">` + dados.codigo + `</th>
+                            <td>` + dados.identificacao + `</td>
+                            <td>` + tipo + `</td>
+                            <td>` + fracionaria + `</td>
+                            <td>` + setor + `</td>
+                            <td>` + dados.valor + `</td>
                             </tr>`;
                     }
                     response.end(readFile("acoes.html").replace("{$table}", html_retorno));
                 });
                 break;
-            case '/submitUsuarios':
-                collectData(request,'usuarios',() => {
-                    response.writeHead(200, {'Content-Type': 'text/html'});
-                    let html_retorno = '';
-                    let count = 0;
-                    for (let dados of list_usuarios){
-                        count++;
-                        let radio = 'Não';
-                        if(dados.inlineRadioOptions === 'S'){
-                            radio = 'Sim';
-                        }
-                        html_retorno += `<tr>
-                            <th scope="row">`+count+`</th>
-                            <td>`+dados.codigo+`</td>
-                            <td>`+dados.nome+`</td>
-                            <td>`+dados.cnh+`</td>
-                            <td>`+dados.dataNascimento+`</td>
-                            <td>`+dados.telefone+`</td>
-                            <td>`+dados.email+`</td>
-                            <td>`+dados.endereco+`</td>
-                            </tr>`;
-                    }
-                    response.end(readFile("usuarios.html").replace("{$table}", html_retorno));
+            case "/acao_comprar":
+                collectData(request, 'operacoes', (data) => {
+                    response.writeHead(200, {"Content-Type": "text/html"});
+                    response.end(readFile("index.html"));
                 });
                 break;
             default:
@@ -110,5 +140,5 @@ module.exports = (request, response) => {
                 response.end('Not a post action!');
                 break;
         }
-      }
+    }
 };
