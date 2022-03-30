@@ -22,9 +22,6 @@ var collectData = (rq, rota, cal) => {
         let new_element = parse(data);
         if (rota === 'acoes') {
             list_acoes.push(new_element);
-        } else if (rota === 'transacoes') {
-            listaOperacoes.push(new_element);
-            listaMinhasAcoes.push(new_element);
         }
         cal(new_element);
     });
@@ -53,17 +50,18 @@ module.exports = (request, response) => {
 
                 list_acoes.forEach((a) => {
                     listaAcoesAbertas += strReplace
-                        .replace("{$id}", a.id)
-                        .replace("{$idShow}", a.id);
+                        .replace("{$id}", a.codigo)
+                        .replace("{$idShow}", a.identificacao);
                 });
 
                 let listAcoesSubstituir = "";
                 let stringReplace = `
                 <tr>
-                            <td>{$tipo}</td>
-                            <td>{$id}</td>
-                            <td>{$fracionario}</td>
-                            <td>{$setorAtuacao}</td>
+                            <td>{$codigo}</td>
+                            <td>{$identificacao}</td>
+                            <td id="tipo">{$tipo}</td>
+                            <td id="fracionaria">{$fracionaria}</td>
+                            <td id="setor">{$setor}</td>
                             <td>{$valor}</td>
                             <td>{$qtde}</td>
                             <td>{$valorTotal}</td>
@@ -72,14 +70,39 @@ module.exports = (request, response) => {
 
                 listaOperacoes.forEach((a) => {
                     listAcoesSubstituir += stringReplace
+                        .replace("{$codigo}", a.codigo)
+                        .replace("{$identificacao}", a.identificacao)
                         .replace("{$tipo}", a.tipo)
-                        .replace("{$id}", a.tipo)
-                        .replace("{$fracionario}", a.fracionario)
-                        .replace("{$setorAtuacao}", a.setorAtuacao)
+                        .replace("{$fracionaria}", a.fracionaria)
+                        .replace("{$setor}", a.setor)
                         .replace("{$valor}", a.valor)
-                        .replace("{$qtde}", a.qtde)
-                        .replace("{$valorTotal}", (a.valor * a.qtde));
+                        .replace("{$qtde}", a.quantidade)
+                        .replace("{$valorTotal}", (parseFloat(a.valor) * parseFloat(a.quantidade)));
                 });
+
+                let listAcoesDisponiveis = "";
+                let acoesReplace = `
+                <tr>
+                            <td>{$codigo}</td>
+                            <td>{$identificacao}</td>
+                            <td id="tipo">{$tipo}</td>
+                            <td id="fracionaria">{$fracionaria}</td>
+                            <td id="setor">{$setor}</td>
+                            <td>{$valor}</td>
+                        </tr>
+                `;
+
+                list_acoes.forEach((a) => {
+                    listAcoesDisponiveis += acoesReplace
+                        .replace("{$codigo}", a.codigo)
+                        .replace("{$identificacao}", a.identificacao)
+                        .replace("{$tipo}", a.tipo)
+                        .replace("{$fracionaria}", a.fracionaria)
+                        .replace("{$setor}", a.setor)
+                        .replace("{$valor}", a.valor)
+                });
+
+                operacoes = operacoes.replace("{$listaAcoesDisponiveis}", listAcoesDisponiveis);
 
                 operacoes = operacoes.replace("{$listaAcoes}", listaAcoesAbertas);
 
@@ -132,6 +155,14 @@ module.exports = (request, response) => {
             case "/acao_comprar":
                 collectData(request, 'operacoes', (data) => {
                     response.writeHead(200, {"Content-Type": "text/html"});
+                    list_acoes.forEach((a) => {
+                        if(a.codigo == data.acao)
+                        {
+                            a.quantidade = data.quantidade;
+                            listaOperacoes.push(a);
+                            listaMinhasAcoes.push(a);
+                        }
+                    })
                     response.end(readFile("index.html"));
                 });
                 break;
