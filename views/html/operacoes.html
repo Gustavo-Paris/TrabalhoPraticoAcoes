@@ -29,6 +29,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/operacoes">Operações</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/carteira">Carteira</a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -94,6 +97,7 @@
                             <th scope="col">Tipo</th>
                             <th scope="col">Francionaria</th>
                             <th scope="col">Setor</th>
+                            <th scope="col">Estilo</th>
                             <th scope="col">Valor</th>
                             <th scope="col">Quantidade</th>
                             <th scope="col">Valor total</th>
@@ -162,6 +166,19 @@
                 else if(cells[i].innerText === '4')
                 {
                     cells[i].innerText = 'Financeiro';
+                }
+            }
+            else if(cells[i].id === "estilo")
+            {
+                if(cells[i].innerText === 'C')
+                {
+                    cells[i].innerText = 'Compra';
+                    cells[i].style.backgroundColor = "green";
+                }
+                else if(cells[i].innerText === 'V')
+                {
+                    cells[i].innerText = 'Venda';
+                    cells[i].style.backgroundColor = "red";
                 }
             }
         }
