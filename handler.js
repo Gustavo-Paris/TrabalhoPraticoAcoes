@@ -1,6 +1,8 @@
 const fs = require("fs");
 const { parse } = require("querystring");
 
+const db = require("./db");
+
 var url = require('url');
 var path = require('path');
 
@@ -8,6 +10,7 @@ var listaOperacoes = [];
 var list_acoes = [];
 var listaMinhasAcoes = [];
 var transacoes = 0;
+var valorCarteira = 0;
 
 var readFile = (file) => {
     let html = fs.readFileSync(__dirname + "/views/html/" + file, "utf8");
@@ -117,6 +120,8 @@ module.exports = (request, response) => {
                 response.writeHead(200, { 'Content-Type': 'text/html' });
                 let carteira = readFile("carteira.html");
 
+                valorCarteira = 0;
+
                 let substituirMinhasAcoes = "";
                 let strAcoesReplace = `
                 <tr>
@@ -146,7 +151,11 @@ module.exports = (request, response) => {
                         .replace("{$qtde}", a.quantidade)
                         .replace("{$valorTotal}", (parseFloat(a.valor) * parseFloat(a.quantidade)))
                         .replace("{$acaoTransacao}", a.transacaoId);
+
+                        valorCarteira = valorCarteira + (parseFloat(a.valor) * parseFloat(a.quantidade));
                 });
+
+                carteira = carteira.replace("{$vlrTotal}", valorCarteira);
 
                 carteira = carteira.replace("{$listaMinhasAcoes}", substituirMinhasAcoes);
 
@@ -171,7 +180,9 @@ module.exports = (request, response) => {
                 aux.transacaoId = transacoes;
                 transacoes++;
                 aux.estilo = 'V';
+                aux.data = new Date();
                 listaOperacoes.push(aux);
+                console.log(aux);
                 response.end(readFile('index.html'));
                 break;
             default:
@@ -227,10 +238,12 @@ module.exports = (request, response) => {
                             transacoes++;
                             aux.quantidade = data.quantidade;
                             aux.estilo = 'C'
+                            aux.data = new Date();
                             listaOperacoes.push(aux);
                             listaMinhasAcoes.push(aux);
                         }
                     })
+                    console.log(aux);
                     response.end(readFile("index.html"));
                 });
                 break;
