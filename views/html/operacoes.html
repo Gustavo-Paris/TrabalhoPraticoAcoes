@@ -16,7 +16,7 @@
         crossorigin="anonymous"></script>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/">Locadora de carros</a>
+            <a class="navbar-brand" href="/">Controladora de Ações</a>
             <button class="navbar-toggler" type="button" data-cbs-toggle="collapse" data-bs-target="/"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -24,10 +24,13 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="/carros">Ações</a>
+                        <a class="nav-link" href="/acoes">Ações</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/operacoes">Operações</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/carteira">Carteira</a>
                     </li>
                 </ul>
             </div>
@@ -45,10 +48,6 @@
                       </select>
                 </div>
                 <div class="col col-2">
-                    <label for="valorAcao">Valor</label>
-                    <input class="form-control" name="valorAcao" id="valorAcao" type="number" value="-1" placeholder="Valor da ação" readonly>
-                </div>
-                <div class="col col-2">
                     <label for="quantidadeAcao">Quantidade</label>
                     <input required type="number" class="form-control" id="quantidade" name="quantidade">
                 </div>
@@ -64,16 +63,41 @@
     <hr>
 
     <div class="container">
+        <h1>Ações disponiveis</h1>
+        <div class="row">
+            <div class="col-12">
+                <table id="acoes" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col">Codigo</th>
+                            <th scope="col">Identificacao</th>
+                            <th scope="col">Tipo</th>
+                            <th scope="col">Francionaria</th>
+                            <th scope="col">Setor</th>
+                            <th scope="col">Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {$listaAcoesDisponiveis}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
         <h1>Minhas transações</h1>
         <div class="row">
             <div class="col-12">
-                <table class="table table-bordered">
+                <table id="transacoes" class="table table-bordered">
                     <thead>
                         <tr>
+                            <th scope="col">Codigo</th>
+                            <th scope="col">Identificacao</th>
                             <th scope="col">Tipo</th>
-                            <th scope="col">ID</th>
-                            <th scope="col">Fracionaria</th>
-                            <th scope="col">Setor de atuação</th>
+                            <th scope="col">Francionaria</th>
+                            <th scope="col">Setor</th>
+                            <th scope="col">Estilo</th>
                             <th scope="col">Valor</th>
                             <th scope="col">Quantidade</th>
                             <th scope="col">Valor total</th>
@@ -94,6 +118,121 @@
             <a href="/" class="btn btn-primary btn-md">Voltar</a>
         </div>
     </div>
+
+    <script>
+        var cells = document.getElementById("transacoes").getElementsByTagName("td");
+        for (var i = 0; i < cells.length; i++) {
+            console.log(cells);
+            if(cells[i].id === "tipo")
+            {
+                if(cells[i].innerText === '1')
+                {
+                    cells[i].innerText = 'Preferencial';
+                }
+                else if(cells[i].innerText === '2')
+                {
+                    cells[i].innerText = 'Ordinaria';
+                }
+            }
+            else if(cells[i].id === "fracionaria")
+            {
+                if(cells[i].innerText === 'S')
+                {
+                    cells[i].innerText = 'Sim';
+                }
+                else if(cells[i].innerText === 'N')
+                {
+                    cells[i].innerText = 'Não';
+                }
+            }
+            else if(cells[i].id === "setor")
+            {
+                if(cells[i].innerText === '5')
+                {
+                    cells[i].innerText = 'Saúde';
+                }
+                else if(cells[i].innerText === '1')
+                {
+                    cells[i].innerText = 'Comunicações';
+                }
+                else if(cells[i].innerText === '2')
+                {
+                    cells[i].innerText = 'Bens industriais';
+                }
+                else if(cells[i].innerText === '3')
+                {
+                    cells[i].innerText = 'Consumo ciclico';
+                }
+                else if(cells[i].innerText === '4')
+                {
+                    cells[i].innerText = 'Financeiro';
+                }
+            }
+            else if(cells[i].id === "estilo")
+            {
+                if(cells[i].innerText === 'C')
+                {
+                    cells[i].innerText = 'Compra';
+                    cells[i].style.backgroundColor = "green";
+                }
+                else if(cells[i].innerText === 'V')
+                {
+                    cells[i].innerText = 'Venda';
+                    cells[i].style.backgroundColor = "red";
+                }
+            }
+        }
+
+        var cells2 = document.getElementById("acoes").getElementsByTagName("td");
+        for (var i = 0; i < cells2.length; i++) {
+            if(cells2[i].id === "tipo")
+            {
+                if(cells2[i].innerText === '1')
+                {
+                    cells2[i].innerText = 'Preferencial';
+                }
+                else if(cells2[i].innerText === '2')
+                {
+                    cells2[i].innerText = 'Ordinaria';
+                }
+            }
+            else if(cells2[i].id === "fracionaria")
+            {
+                if(cells2[i].innerText === 'S')
+                {
+                    cells2[i].innerText = 'Sim';
+                }
+                else if(cells2[i].innerText === 'N')
+                {
+                    cells2[i].innerText = 'Não';
+                }
+            }
+            else if(cells2[i].id === "setor")
+            {
+                if(cells2[i].innerText === '5')
+                {
+                    cells2[i].innerText = 'Saúde';
+                }
+                else if(cells2[i].innerText === '1')
+                {
+                    cells2[i].innerText = 'Comunicações';
+                }
+                else if(cells2[i].innerText === '2')
+                {
+                    cells2[i].innerText = 'Bens industriais';
+                }
+                else if(cells2[i].innerText === '3')
+                {
+                    cells2[i].innerText = 'Consumo ciclico';
+                }
+                else if(cells2[i].innerText === '4')
+                {
+                    cells2[i].innerText = 'Financeiro';
+                }
+            }
+        }
+
+    </script>
     
 </body>
 
